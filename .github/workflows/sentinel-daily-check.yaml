@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Run PR Sentinel
-        run: npx ts-node src/index.ts
+        run: npx tsx src/index.ts
 
       - name: Convert CSV to Markdown Table
         id: convert-csv
