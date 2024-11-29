@@ -49,7 +49,7 @@ jobs:
 
       - name: Create issue with PR review results
         run: |
-          ISSUE_BODY=$(cat table.md)
+          ISSUE_BODY=PR Reviewers
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"title\": \"PR Review Delay Report\", \"body\": \"### PR Review Results\n\n$ISSUE_BODY\"}" \
