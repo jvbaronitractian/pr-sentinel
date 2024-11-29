@@ -47,10 +47,8 @@ jobs:
           done
         shell: bash
 
-      - name: Create issue with PR review results
-        run: |
-          ISSUE_BODY=PR Reviewers
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{\"title\": \"PR Review Delay Report\", \"body\": \"### PR Review Results\n\n$ISSUE_BODY\"}" \
-            https://api.github.com/repos/${{ github.repository }}/issues
+      - name: Create Issue From File
+        uses: peter-evans/create-issue-from-file@v5.0.1
+          title: PR Reviewers Report
+          content-filepath: ./table.md
+            
