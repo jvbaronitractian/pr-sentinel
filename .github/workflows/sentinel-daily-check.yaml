@@ -18,6 +18,10 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Install ts-node and TypeScript
+        run: |
+          npm install ts-node typescript
+
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
@@ -29,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Run PR Sentinel
-        run: npx tsx src/index.ts
+        run: npx ts-node src/index.ts
 
       - name: Convert CSV to Markdown Table
         id: convert-csv
