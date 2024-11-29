@@ -1,0 +1,17 @@
+{
+  "name": "pr-sentinel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "type": "module",
+  "license": "ISC",
+  "description": "A Node.js application to monitor pull requests and track delayed reviews.",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "octokit": "^4.0.2"
+  }
+}
