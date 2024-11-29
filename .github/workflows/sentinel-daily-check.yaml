@@ -22,14 +22,14 @@ jobs:
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
           envkey_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          envkey_REPO_OWNER: ${{ vars.SOME_ACTION_VARIABLE }}
-          envkey_REPO_NAME: ${{ vars.SOME_ACTION_VARIABLE }}
+          envkey_REPO_OWNER: ${{ vars.REPO_OWNER }}
+          envkey_REPO_NAME: ${{ vars.REPO_NAME }}
 
       - name: Install dependencies
         run: npm install
 
       - name: Run PR Sentinel
-        run: npx ts-node src/index.ts
+        run: npx tsx src/index.ts
 
       - name: Convert CSV to Markdown Table
         id: convert-csv
