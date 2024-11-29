@@ -8,9 +8,11 @@
   "license": "ISC",
   "description": "A Node.js application to monitor pull requests and track delayed reviews.",
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "octokit": "^4.0.2"
   }
