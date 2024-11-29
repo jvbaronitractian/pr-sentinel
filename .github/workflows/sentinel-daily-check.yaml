@@ -49,6 +49,6 @@ jobs:
 
       - name: Create Issue From File
         uses: peter-evans/create-issue-from-file@v5.0.1
+        with:
           title: PR Reviewers Report
           content-filepath: ./table.md
-            
