@@ -1,0 +1,51 @@
+name: PR Sentinel - Daily Check
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  run-pr-sentinel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v2.0.3
+        with:
+          envkey_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          envkey_REPO_OWNER: ${{ vars.SOME_ACTION_VARIABLE }}
+          envkey_REPO_NAME: ${{ vars.SOME_ACTION_VARIABLE }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run PR Sentinel
+        run: npx ts-node src/index.ts
+
+      - name: Convert CSV to Markdown Table
+        id: convert-csv
+        run: |
+          echo "| PR Number | Reviewer | Status |" > table.md
+          echo "|-----------|----------|------------------|" >> table.md
+          tail -n +2 pr_reviewers.csv | while IFS=',' read -r pullNumber author status
+          do
+            echo "| $pullNumber | $author | $status |" >> table.md
+          done
+        shell: bash
+
+      - name: Create issue with PR review results
+        run: |
+          ISSUE_BODY=$(cat table.md)
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"title\": \"PR Review Delay Report\", \"body\": \"### PR Review Results\n\n$ISSUE_BODY\"}" \
+            https://api.github.com/repos/${{ github.repository }}/issues
