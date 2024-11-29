@@ -1,3 +1,4 @@
+import { createObjectCsvWriter } from "csv-writer";
 import * as dotenv from "dotenv";
 import { Octokit } from "octokit";
 
@@ -6,7 +7,9 @@ dotenv.config();
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const REPO_OWNER = process.env.REPO_OWNER;
 const REPO_NAME = process.env.REPO_NAME;
+
 const USER_AGENT = "pr-sentinel/1.0.0";
+const OUTPUT_CSV = "pr_reviewers.csv";
 const DAYS_THRESHOLD = 2;
 
 if (!GITHUB_TOKEN || !REPO_OWNER || !REPO_NAME) {
@@ -15,6 +18,26 @@ if (!GITHUB_TOKEN || !REPO_OWNER || !REPO_NAME) {
   );
   process.exit(1);
 }
+
+enum ReviewStatus {
+  PENDING = "PENDING",
+  REVIEW_REQUESTED = "REVIEW_REQUESTED",
+}
+
+type DelayedReviewers = {
+  author: string;
+  pullNumber: number;
+  status: ReviewStatus;
+};
+
+const csvWriter = createObjectCsvWriter({
+  path: OUTPUT_CSV,
+  header: [
+    { id: "pullNumber", title: "PR Number" },
+    { id: "author", title: "Reviewer" },
+    { id: "status", title: "Status" },
+  ],
+});
 
 const octokit = new Octokit({
   auth: GITHUB_TOKEN,
@@ -56,14 +79,18 @@ for (const pr of pullRequests.data.items) {
 
   const prCreatedAt = new Date(pr.created_at);
 
-  const delayedReviewers: string[] = [];
+  const delayedReviewers: DelayedReviewers[] = [];
 
   for (const reviewer of requestedReviewers) {
     const hasNotReviewed = !reviewersWithReviews.has(reviewer);
     const isOutOfThreshold = prCreatedAt < thresholdDate;
 
     if (hasNotReviewed && isOutOfThreshold) {
-      delayedReviewers.push(reviewer);
+      delayedReviewers.push({
+        author: reviewer,
+        pullNumber: pr.number,
+        status: ReviewStatus.PENDING,
+      });
     }
   }
 
@@ -75,19 +102,21 @@ for (const pr of pullRequests.data.items) {
       const isOutOfThreshold = reviewDate < thresholdDate;
 
       if (isOutOfThreshold) {
-        delayedReviewers.push(review.user.login);
+        delayedReviewers.push({
+          author: review.user.login,
+          pullNumber: pr.number,
+          status: ReviewStatus.REVIEW_REQUESTED,
+        });
       }
     }
   }
 
-  const uniqueDelayedReviewers = Array.from(new Set(delayedReviewers));
+  if (delayedReviewers.length > 0) {
+    await csvWriter.writeRecords(delayedReviewers);
 
-  if (uniqueDelayedReviewers.length > 0) {
     console.log(
-      `PR #${pr.number} - Reviewers delayed (no review or pending review for more than ${DAYS_THRESHOLD} days):`
+      `PR #${pr.number} - Reviewers delayed (no review or pending review for more than ${DAYS_THRESHOLD} days):`,
+      delayedReviewers
     );
-    for (const reviewer of uniqueDelayedReviewers) {
-      console.log(`- ${reviewer}`);
-    }
   }
 }
