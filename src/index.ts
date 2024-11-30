@@ -1,5 +1,6 @@
 import { createObjectCsvWriter } from "csv-writer";
 import * as dotenv from "dotenv";
+import moment from "moment-timezone";
 import { Octokit } from "octokit";
 
 dotenv.config();
@@ -27,7 +28,7 @@ enum ReviewStatus {
 type DelayedReviewers = {
   author: string;
   pullNumber: number;
-  status: ReviewStatus;
+  lastReviewDate: string;
 };
 
 const csvWriter = createObjectCsvWriter({
@@ -35,7 +36,7 @@ const csvWriter = createObjectCsvWriter({
   header: [
     { id: "pullNumber", title: "PR Number" },
     { id: "author", title: "Reviewer" },
-    { id: "status", title: "Status" },
+    { id: "lastReviewDate", title: "Last Review Date" },
   ],
 });
 
@@ -89,7 +90,7 @@ for (const pr of pullRequests.data.items) {
       delayedReviewers.push({
         author: reviewer,
         pullNumber: pr.number,
-        status: ReviewStatus.PENDING,
+        lastReviewDate: "N/A",
       });
     }
   }
@@ -102,10 +103,14 @@ for (const pr of pullRequests.data.items) {
       const isOutOfThreshold = reviewDate < thresholdDate;
 
       if (isOutOfThreshold) {
+        const formattedDate = moment(reviewDate)
+          .tz("America/Sao_Paulo")
+          .format("YYYY-MM-DD HH:mm:ss");
+
         delayedReviewers.push({
           author: review.user.login,
           pullNumber: pr.number,
-          status: ReviewStatus.REVIEW_REQUESTED,
+          lastReviewDate: formattedDate,
         });
       }
     }
