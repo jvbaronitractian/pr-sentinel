@@ -39,17 +39,21 @@ jobs:
       - name: Convert CSV to Markdown Table
         id: convert-csv
         run: |
-          echo "| PR Number | Reviewer | Last Review Date |" > table.md
-          echo "|-----------|----------|------------------|" >> table.md
+          echo "| 📋 **PR Number** | 🧑‍💻 **Reviewer** | 📅 **Last Review Date** |" > table.md
+          echo "|------------------|------------------|------------------------|" >> table.md
           tail -n +2 pr_reviewers.csv | while IFS=',' read -r pullNumber author lastReviewDate
           do
-            prLink="[#$pullNumber](https://github.com/${{ vars.REPO_OWNER }}/${{ vars.REPO_NAME }}/pull/$pullNumber)"
+            prLink="[🔗 #$pullNumber](https://github.com/${{ vars.REPO_OWNER }}/${{ vars.REPO_NAME }}/pull/$pullNumber)"
             echo "| $prLink | $author | $lastReviewDate |" >> table.md
           done
         shell: bash
 
+      - name: Get Current Date
+        id: current-date
+        run: echo "date=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: Create Issue From File
         uses: peter-evans/create-issue-from-file@v5.0.1
         with:
-          title: PR Reviewers Report
+          title: "PR Reviewers Report - ${{ env.date }}"
           content-filepath: ./table.md
