@@ -43,7 +43,7 @@ jobs:
           echo "|------------------|------------------|------------------------|" >> table.md
           tail -n +2 pr_reviewers.csv | while IFS=',' read -r pullNumber author lastReviewDate
           do
-            prLink="[🔗 #$pullNumber](https://github.com/${{ vars.REPO_OWNER }}/${{ vars.REPO_NAME }}/pull/$pullNumber)"
+            prLink="[#$pullNumber](https://github.com/${{ vars.REPO_OWNER }}/${{ vars.REPO_NAME }}/pull/$pullNumber)"
             echo "| $prLink | $author | $lastReviewDate |" >> table.md
           done
         shell: bash
