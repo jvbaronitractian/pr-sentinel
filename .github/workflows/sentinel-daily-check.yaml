@@ -2,7 +2,7 @@ name: PR Sentinel - Daily Check
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 13 * * 1-5"
   workflow_dispatch:
 
 jobs:
@@ -39,11 +39,12 @@ jobs:
       - name: Convert CSV to Markdown Table
         id: convert-csv
         run: |
-          echo "| PR Number | Reviewer | Status |" > table.md
+          echo "| PR Number | Reviewer | Last Review Date |" > table.md
           echo "|-----------|----------|------------------|" >> table.md
-          tail -n +2 pr_reviewers.csv | while IFS=',' read -r pullNumber author status
+          tail -n +2 pr_reviewers.csv | while IFS=',' read -r pullNumber author lastReviewDate
           do
-            echo "| $pullNumber | $author | $status |" >> table.md
+            prLink="[#$pullNumber](https://github.com/${{ vars.REPO_OWNER }}/${{ vars.REPO_NAME }}/pull/$pullNumber)"
+            echo "| $prLink | $author | $lastReviewDate |" >> table.md
           done
         shell: bash
 
