@@ -5,7 +5,7 @@ import { Octokit } from "octokit";
 
 dotenv.config();
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const REPO_OWNER = process.env.REPO_OWNER;
 const REPO_NAME = process.env.REPO_NAME;
 
@@ -13,9 +13,9 @@ const USER_AGENT = "pr-sentinel/1.0.0";
 const OUTPUT_CSV = "pr_reviewers.csv";
 const DAYS_THRESHOLD = 2;
 
-if (!GITHUB_TOKEN || !REPO_OWNER || !REPO_NAME) {
+if (!AUTH_TOKEN || !REPO_OWNER || !REPO_NAME) {
   console.error(
-    "Error: Make sure GITHUB_TOKEN, REPO_OWNER, and REPO_NAME are defined in the .env file."
+    "Error: Make sure AUTH_TOKEN, REPO_OWNER, and REPO_NAME are defined in the .env file."
   );
   process.exit(1);
 }
@@ -41,7 +41,7 @@ const csvWriter = createObjectCsvWriter({
 });
 
 const octokit = new Octokit({
-  auth: GITHUB_TOKEN,
+  auth: AUTH_TOKEN,
   userAgent: USER_AGENT,
 });
 
