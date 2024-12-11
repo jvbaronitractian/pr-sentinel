@@ -26,7 +26,7 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          envkey_GITHUB_TOKEN: ${{ vars.AUTH_TOKEN }}
+          envkey_AUTH_TOKEN: ${{ vars.AUTH_TOKEN }}
           envkey_REPO_OWNER: ${{ vars.REPO_OWNER }}
           envkey_REPO_NAME: ${{ vars.REPO_NAME }}
 
