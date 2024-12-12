@@ -47,7 +47,6 @@ const octokit = new Octokit({
 
 const pullRequests = await octokit.rest.search.issuesAndPullRequests({
   q: `repo:${REPO_OWNER}/${REPO_NAME} state:open is:pr is:open`,
-  per_page: 10,
 });
 
 const thresholdDate = new Date();
@@ -105,7 +104,7 @@ for (const pr of pullRequests.data.items) {
       if (isOutOfThreshold) {
         const formattedDate = moment(reviewDate)
           .tz("America/Sao_Paulo")
-          .format("YYYY-MM-DD HH:mm:ss");
+          .format("DD-MM-YYYY HH:mm:ss");
 
         delayedReviewers.push({
           author: review.user.login,
